@@ -41,3 +41,24 @@ float** create_matrix(int dimx, int dimy, float init_value)
     }
     return mat;
 }
+
+
+float find_matrix_max(float** mat, int dimx, int dimy)
+/*
+    Find the max value in the matrix.
+*/
+{
+    float max = mat[0][0];
+    float value;
+
+    for (int i = 0; i < dimx; i++) {
+        for (int j = 0; j < dimy; j++) {
+            value = mat[i][j]; 
+            if (value > max) {
+                max = value;
+            }
+        }
+    }
+
+    return max;
+}
