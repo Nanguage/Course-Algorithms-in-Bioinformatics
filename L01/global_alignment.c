@@ -1,0 +1,412 @@
+/*
+Implementation of the Needleman-Wunsch algorithm.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "matrix.h"
+
+#define EMPTY_SYMBOL '-'
+#define INSERT_SYMBOL '+'
+#define DELETE_SYMBOL '-'
+#define MATCH_SYMBOL '|'
+#define MISMATCH_SYMBOL 'x'
+
+#define DEBUG 1
+
+
+void init_score_matrix(float** mat, int dimx, int dimy,
+                       float penalty_insert, float penalty_delete)
+/*
+    Initialize the score matrix for perform the N-W algorithm
+
+        V(0, 0) = 0
+        V(0, j) = V(0, j-1) + delta(_, T[j])
+        V(i, 0) = V(i-1, 0) + delta(S[i], _)
+
+*/
+{
+    mat[0][0] = 0;
+
+    for (int j = 1; j < dimy; j++) {
+        // Insertion at the begining position
+        mat[0][j] = mat[0][j-1] + penalty_insert;
+    }
+
+    for (int i = 1; i < dimx; i++) {
+        // Deletion at the begining position
+        mat[i][0] = mat[i-1][0] + penalty_delete;
+    }
+}
+
+
+float base_similar_score(char s, char t,
+                         float match_score, float penalty_mismatch,
+                         float penalty_insert, float penalty_delete)
+/*
+    Get the similarity score between two base.
+*/
+{
+    float score;
+
+    if (s != EMPTY_SYMBOL && t != EMPTY_SYMBOL) {
+        if (s == t) {
+            score = match_score;
+        } else {
+            score = penalty_mismatch;
+        }
+    } else if (s == EMPTY_SYMBOL && t != EMPTY_SYMBOL) {
+        // Deletion
+        score = penalty_delete;
+    } else if (s != EMPTY_SYMBOL && t == EMPTY_SYMBOL) {
+        // Insertion
+        score = penalty_insert;
+    } else {
+        score = 0;
+    }
+
+    return score;
+}
+
+
+int maximum_idx(float* arr, int size)
+/*
+    Find the maximum number in an array. return the index.
+*/
+{
+    float max = arr[0];
+    int max_idx = 0;
+
+    for (int i = 1; i < size; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+            max_idx = i;
+        }
+    }
+
+    return max_idx;
+}
+
+
+void fill_score_matrix(float** mat, char* source, char* target,
+                       float match_score, float penalty_mismatch,
+                       float penalty_insert, float penalty_delete)
+/*
+    Fill the score matrix.
+
+    Dynamic Programing process:
+
+        V(i, j) = max(
+            V(i-1, j-1) + delta(S[i], T[j]), # Match/Mismatch
+            V(i-1, j) + delta(S[i], _), # Delete
+            V(i, j-1) + delta(_, T[j])  # Insert
+        )
+*/
+{
+    int dimx = strlen(source) + 1;
+    int dimy = strlen(target) + 1;
+
+    float score_match, score_insert, socre_delete;
+    float simi_score_m, simi_score_i, simi_score_d;
+
+    for (int i = 1; i < dimx; i++) {
+        for (int j = 1; j < dimy; j++) {
+
+            char s = source[i-1];
+            char t = target[i-1];
+
+            simi_score_m = base_similar_score(s, t, match_score, penalty_mismatch,
+                                                    penalty_insert, penalty_delete);
+            score_match = mat[i-1][j-1] + simi_score_m;
+
+
+            simi_score_i = base_similar_score(s, EMPTY_SYMBOL, match_score, penalty_mismatch,
+                                                               penalty_insert, penalty_delete);
+            score_insert = mat[i][j-1] + simi_score_i;
+
+
+            simi_score_d = base_similar_score(EMPTY_SYMBOL, t, match_score, penalty_mismatch,
+                                                               penalty_insert, penalty_delete);
+            socre_delete = mat[i-1][j] + simi_score_d;
+
+            float arr[3] = {score_match, score_insert, socre_delete};
+
+            mat[i][j] = arr[maximum_idx(arr, 3)];
+        }
+    }
+}
+
+
+char* backtrack(float** mat, char* source, char* target)
+/*
+    Do backtrack, find one optimal path from the matrix.
+*/
+{
+    int dimx = strlen(source) + 1;
+    int dimy = strlen(target) + 1;
+
+    char* track_res = malloc((dimx + dimy + 1)*sizeof(char));
+    char* res_ptr = track_res;
+
+    int x = dimx - 1;
+    int y = dimy - 1;
+    float s_left, s_up, s_lu;
+
+    while (x != 0 || y != 0) {
+
+        if (x == 0) {
+            // arrive at the top border
+            *res_ptr = DELETE_SYMBOL;
+            y--;
+        } else if (y == 0) {
+            // arrive at the left border
+            *res_ptr = INSERT_SYMBOL;
+            x--;
+        } else {
+            s_left = mat[x][y-1];
+            s_up = mat[x-1][y];
+            s_lu = mat[x-1][y-1];
+
+            float arr[4] = {s_lu, s_left, s_up};
+            //if (DEBUG) { printf("%d, %d\n", x, y); printf("%f, %f, %f\n", s_lu, s_left, s_up); }
+            switch (maximum_idx(arr, 3)) {
+                case 0 :
+                    // go left up
+                    if (source[x-1] == target[y-1]) {
+                        *res_ptr = MATCH_SYMBOL; 
+                    } else {
+                        *res_ptr = MISMATCH_SYMBOL;
+                    }
+                    x--; y--;
+                    break;
+                case 1 :
+                    // go left
+                    *res_ptr = DELETE_SYMBOL;
+                    y--;
+                    break;
+                case 2 :
+                    // go up
+                    *res_ptr = INSERT_SYMBOL;
+                    x--;
+                    break; 
+            }
+        }
+        res_ptr++;
+    }
+
+    *res_ptr = '\0';
+
+    return track_res;
+
+}
+
+
+float alignment_score(char* track_res,
+                      float match_score, float penalty_mismatch,
+                      float penalty_insert, float penalty_delete)
+/*
+    Calculate the alignment score from the backtrack result string.
+*/
+{
+    float score = 0;
+    int size = strlen(track_res);
+    char c;
+    for (int i = 0; i < size; i++) {
+        c = track_res[i];
+        switch (c) {
+            case MATCH_SYMBOL :
+                score += match_score;
+                break;
+            case MISMATCH_SYMBOL :
+                score += penalty_mismatch;
+                break;
+            case INSERT_SYMBOL :
+                score += penalty_insert;
+                break;
+            case DELETE_SYMBOL :
+                score += penalty_delete;
+                break;
+        }
+    }
+
+    return score;
+}
+
+
+char* align_NW(char* source, char* target,
+              float match_score, float penalty_mismatch,
+              float penalty_insert, float penalty_delete)
+/*
+    Perform the NW algorirhm.
+*/
+{
+    int dimx = strlen(source) + 1;
+    int dimy = strlen(target) + 1;
+
+    float** mat = create_matrix(dimx, dimy, 0);
+
+    if (DEBUG) {
+        printf("matrix size: %d, %d\n\n", dimx, dimy);
+        printf("empty matrix:\n");
+        print_matrix(mat, dimx, dimy);
+    }
+
+    init_score_matrix(mat, dimx, dimy, penalty_insert, penalty_delete);
+
+    if (DEBUG) {
+        printf("initialized matrix:\n");
+        print_matrix(mat, dimx, dimy);
+    }
+
+    fill_score_matrix(mat, source, target, match_score, penalty_mismatch, penalty_insert, penalty_delete);
+
+    if (DEBUG) {
+        printf("filled matrix:\n");
+        print_matrix(mat, dimx, dimy);
+    }
+
+    char* track_res = backtrack(mat, source, target);
+
+    free(mat);
+
+    return track_res;
+}
+
+
+int max_align_len(char* track_res, int max_seq_len)
+{
+    int len_i = 0;
+    int len_d = 0;
+    int len = max_seq_len;
+
+    for (char* ptr = track_res; *ptr != '\0'; ptr++) {
+        switch (*ptr) {
+            case INSERT_SYMBOL :
+                len_i++;
+                break;
+            case DELETE_SYMBOL :
+                len_d++;
+                break;
+        }
+    }
+
+    if (len_i > len_d) {
+        len += len_i;
+    } else {
+        len += len_d;
+    }
+
+    return len;
+}
+
+
+void print_alignment_side(char* source, char* target, char* track_res, char choice)
+{
+    int seq_len;
+    char* seq;
+    char flag;
+
+    int r_len = strlen(track_res);
+
+    int max_seq_len;
+    int len_sou = strlen(source);
+    int len_tar = strlen(target);
+    if (len_tar > len_sou) {
+        max_seq_len = len_tar;
+    } else {
+        max_seq_len = len_sou;
+    }
+
+    int max_len = max_align_len(track_res, max_seq_len);
+
+    if (choice == 'u' || choice == 't') {
+        seq_len = len_tar;
+        seq = target;
+        flag = DELETE_SYMBOL;
+    } else {
+        seq_len = len_sou;
+        seq = source;
+        flag = INSERT_SYMBOL;
+    }
+
+
+
+    char* r = track_res + r_len -1;
+    int i = 0;
+    int idx = 0;
+
+     // print sequence
+     while (r >= track_res) {
+         if (*r == flag) {
+             putchar(EMPTY_SYMBOL);
+         } else {
+             if (idx >= seq_len) {
+                 break;
+             }
+             putchar(seq[idx]);
+             idx++;
+         }
+         r--;
+         i++;
+     }
+
+    while (idx < seq_len) {
+        putchar(seq[idx]);
+        idx++;
+        i++;
+    }
+
+    while (i < max_len) {
+        putchar(EMPTY_SYMBOL);
+        i++;
+    }
+}
+
+
+void print_alignment_middle(char* track_res)
+{
+    int r_len = strlen(track_res);
+    char* r = track_res + r_len -1;
+
+    while (r != track_res) {
+        if (*r == MATCH_SYMBOL) {
+            putchar(MATCH_SYMBOL);
+        } else {
+            putchar(' ');
+        }
+        r--;
+    }
+}
+
+
+void print_alignment(char* source, char* target, char* track_res)
+/*
+    Print the alignment result to a easy to read format.
+*/
+{
+    print_alignment_side(source, target, track_res, 't');
+    printf("\n");
+    print_alignment_middle(track_res);
+    printf("\n");
+    print_alignment_side(source, target, track_res, 's');
+    printf("\n");
+}
+
+
+int main(int argv, char** argc)
+{
+    char* source = "AATTAAAAAAG";
+    char* target = "AAATTTAAGGGGC";
+
+    char* track_res = align_NW(source, target, 2, -3, -5, -5);
+    printf("backtrack result: ");
+    printf("%s\n", track_res);
+    print_alignment(source, target, track_res);
+    float score = alignment_score(track_res, 2, -3, -5, -5);
+    printf("score: %.2f\n", score);
+
+    free(track_res);
+
+}
