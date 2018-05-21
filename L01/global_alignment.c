@@ -6,8 +6,8 @@ Implementation of the Needleman-Wunsch algorithm.
 #include <stdlib.h>
 #include <string.h>
 
-#include "matrix.h"
 #include "utilities.h"
+#include "matrix.h"
 
 #define DEBUG 1
 
@@ -62,7 +62,7 @@ void fill_score_matrix(float** mat, char* source, char* target,
         for (int j = 1; j < dimy; j++) {
 
             char s = source[i-1];
-            char t = target[i-1];
+            char t = target[j-1];
 
             simi_score_m = base_similar_score(s, t, match_score, penalty_mismatch,
                                                     penalty_insert, penalty_delete);
@@ -227,7 +227,7 @@ int main(int argv, char** argc)
     char* source = "AATTAAAAAAG";
     char* target = "AAATTTAAGGGGC";
 
-    char* track_res = align_NW(source, target, 2, -3, -5, -5);
+    char* track_res = align_NW(source, target, 1, -1, -2, -2);
     printf("backtrack result: ");
     printf("%s\n", track_res);
 
@@ -238,7 +238,7 @@ int main(int argv, char** argc)
     print_route(route);
 
     print_alignment(source, target, track_res);
-    float score = alignment_score(track_res, 2, -3, -5, -5);
+    float score = alignment_score(track_res, 1, -1, -2, -2);
     printf("score: %.2f\n", score);
 
     free(track_res);

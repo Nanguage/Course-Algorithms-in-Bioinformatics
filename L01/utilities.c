@@ -229,6 +229,7 @@ void destruct_route(Route* route)
         free(previous_node);
     }
     free(curr_node);
+    free(route->track_result);
     free(route);
 }
 
