@@ -32,7 +32,6 @@ class Nussinov(object):
                 v0 = V[i+1][j-1] + score(seq[i], seq[j])
                 v1 = max([V[i][k] + V[k+1][j] for k in range(i, j)])
                 V[i][j] = max(v0, v1)
-                print(i, j, seq[i], seq[j], score(seq[i], seq[j]), v0, v1)
         self.V_matrix = V
 
     def get_pairs(self):
