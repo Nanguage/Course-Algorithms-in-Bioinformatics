@@ -46,7 +46,20 @@ def pairs2parentheses(pairs, seq_len,
     return parentheses
 
 
-def print_matrix(mat):
-    import numpy as np
-    arr = np.array(mat)
-    print(arr)
+def print_matrix(mat, seq=None, width=3):
+    n = len(mat)
+    m = len(mat[0])
+    for i in range(n):
+        print("%{}i)".format(width-1)%(i), end='')
+    print()
+    if seq:
+        for i in range(n):
+            print("%{}s".format(width)%seq[i], end='')
+        print()
+    for i in range(n):
+        for j in range(m):
+            print("%{}s".format(width)%mat[i][j], end='')
+        if seq:
+            print("%{}s".format(width)%seq[i], end='')
+        print("%{}i)".format(width)%(i), end='')
+        print()
