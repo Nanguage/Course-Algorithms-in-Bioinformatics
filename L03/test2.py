@@ -9,10 +9,15 @@ if __name__ == "__main__":
     #seq = "AUAUGCGC"
     #seq = "ACCAGGU"
     seq = "GCGCUCUGAUGAGGCCGCAAGGCCGAAACUGCCGCAAGGCAGUCAGCGC"
+    #seq = "AGGCCGCAAGGCCGAAACUGCCG"
+    #seq = "CAUCGAACGUCCUCAAGACAGCUCUCU"
     msp.seq = seq
     msp.fill_matrix()
-    print_matrix(msp.V_matrix)
+    print_matrix(msp.V_matrix, seq=seq)
     pairs = msp.get_pairs()
     print(pairs)
     print(seq)
-    print(pairs2parentheses(pairs, len(seq)))
+    parentheses = pairs2parentheses(pairs, len(seq))
+    print(parentheses)
+    print(parentheses.count("("), parentheses.count(")"))
+    assert parentheses.count("(") == parentheses.count(")")
