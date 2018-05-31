@@ -19,5 +19,4 @@ if __name__ == "__main__":
     print(seq)
     parentheses = pairs2parentheses(pairs, len(seq))
     print(parentheses)
-    print(parentheses.count("("), parentheses.count(")"))
     assert parentheses.count("(") == parentheses.count(")")
