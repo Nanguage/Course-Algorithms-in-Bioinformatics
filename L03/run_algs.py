@@ -13,7 +13,7 @@ if not os.path.exists(RES_PATH):
 for alg in ALGs:
     for fa in FA_FILES:
         fa_path = join(DATA_DIR, fa)
-        res_path = join(RES_PATH, alg+"_"+fa.replace(".fa", ""))
+        res_path = join(RES_PATH, fa.replace(".fa", "")+"."+alg+".structure")
         cmd = "python main.py {} --method {} > {}".format(fa_path, alg, res_path)
         print(cmd)
         os.system(cmd)
