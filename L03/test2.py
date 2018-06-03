@@ -13,7 +13,7 @@ if __name__ == "__main__":
     #seq = "CAUCGAACGUCCUCAAGACAGCUCUCU"
     msp.seq = seq
     msp.fill_matrix()
-    print_matrix(msp.V_matrix, seq=seq)
+    #print_matrix(msp.V_matrix, seq=seq)
     pairs = msp.get_pairs()
     print(pairs)
     print(seq)
