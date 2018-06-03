@@ -63,3 +63,25 @@ def print_matrix(mat, seq=None, width=3):
             print("%{}s".format(width)%seq[i], end='')
         print("%{}i)".format(width)%(i), end='')
         print()
+
+
+def view_matrix(mat, seq=None):
+    from gtabview import view
+    mat_to_view = []
+    if seq:
+        mat_to_view.append(list(seq))
+    for i, l in enumerate(mat):
+        lis = []
+        mat_to_view.append(lis)
+        for j in range(len(l)):
+            lis.append("{0:.2f}".format(l[j]))
+        if seq:
+            lis.append(seq[i])
+    view(mat_to_view)
+
+
+def simi_equal(a, b, exact=0.001):
+    if a-exact < b < a+exact:
+        return True
+    else:
+        return False

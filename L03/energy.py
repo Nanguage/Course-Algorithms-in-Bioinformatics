@@ -11,10 +11,12 @@ STACKING_PAIR_FREE_ENERGY_ORDER = \
     [('A', 'U'), ('C', 'G'), ('G', 'C'),
      ('U', 'A'), ('G', 'U'), ('U', 'G')]
 
+PAIR2ORDER = {pair: i for (i, pair) in enumerate(STACKING_PAIR_FREE_ENERGY_ORDER)}
+
 def stacking_pair_free_energy(p, q, x, y):
-    order_list = STACKING_PAIR_FREE_ENERGY_ORDER
+    p, q, x, y = [i.upper() for i in (p, q, x, y)]
     mat = STACKING_PAIR_FREE_ENERGY_MAT
-    pair2order = {pair: i for (i, pair) in enumerate(order_list)}
+    pair2order = PAIR2ORDER
     if (x, y) in pair2order and (p, q) in pair2order:
         xy_pos = pair2order[(x, y)]
         pq_pos = pair2order[(p, q)]
