@@ -402,3 +402,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+.~lock.*
+*.swp
+*.swo
