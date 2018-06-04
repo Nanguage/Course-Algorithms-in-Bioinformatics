@@ -21,6 +21,7 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 
+\usepackage[lined,ruled,linesnumbered]{algorithm2e}
 
 \begin{document}
 
@@ -29,7 +30,7 @@
 \section{About the Program}
 
 \subsection{Dependency}
-This program is develop and tested under Linux system,
+This program is developed and tested on Linux system,
 and Python version $\geq$ 3.4 is required.
 
 \subsection{Usage}
@@ -131,6 +132,11 @@ So, the recursive function is:
 \end{equation}
 
 \noindent
+\textbf{Recover pairs:} \\
+
+We can recover the pairs by backtrack the Matrix, detail see Algorithm \ref{alg:backtrack1} and the implementation.
+
+\noindent
 \subsubsection{Complexity Analyze}
 \label{ana:max_stack}
 
@@ -141,9 +147,66 @@ So this algorithm can be solved in $O(n^3)$ time.
 This complexity is same to the Nussinov algorithm.
 
 \subsubsection{Implementation}
+See Python module \url{./maxstacks.py} \\
 
-See Python module \url{./maxstacks.py}
+\pagebreak
 
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+    \SetKwProg{Fn}{procedure}{}{end}
+    \SetKwFunction{backtrack}{backtrack}
+    \DontPrintSemicolon
+
+    \Input{A filled Matrix V[1..n, 1..n]}
+    \Output{A set of pairs $P$}
+    \BlankLine
+
+    \Fn{\backtrack{i, j}} {
+        \uIf{$j \leq i+2$} {
+            \Return
+        }
+        \uElseIf{$V(i,j) = V(i, j-1)$} {
+            \backtrack{i, j-1}
+        }
+        \uElseIf{$V(i,j) = V(i+1, j)$} {
+            \backtrack{i+1, j}
+        }
+        \Else {
+            \For{$k \leftarrow i$ \KwTo $j$} {
+                \eIf{$V(i,j) = V(i,k) + V(k+1,j)$} {
+                    \backtrack{i, k} \\
+                    \backtrack{k+1, j} \\
+                    \Return
+                } {
+                    $m = floor(\dfrac{i-k+1}{2})-1$
+                    \BlankLine
+                    \For{$h \leftarrow m$ \KwTo $1$} {
+                        $AllMatch \leftarrow \displaystyle\prod_{t=0}^{h} \delta(S[i+t], S[j-t])$
+                        \BlankLine
+                        \If{$AllMatch \neq 0 \wedge V(i,j) = V(k+h+1, j-h-1) + h$} {
+                            \For{$t \leftarrow 0$ \KwTo $h$} {
+                                $P \cup \{(k+t, j-t)\}$
+                            }
+                            \backtrack{i, k-1} \\
+                            \backtrack{k+h+1, j-h-1} \\
+                            \Return
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    \BlankLine
+    \backtrack{1,n}
+
+    \label{alg:backtrack1}
+    \caption{Backtrack Algorithm}
+
+\end{algorithm}
+
+
+\pagebreak
 \subsection{Minimize free energy of stacking pairs}
 
 \subsubsection{Algorithm description}
@@ -207,6 +270,8 @@ See Python module \url{./minstackenergy.py} \\
 \noindent
 The advantage and disadvantage about this method is disscused in section \ref{discussion}.
 
+\pagebreak
+
 \section{Benchmark on Testing Data}
 \subsection{Run algorithms on the testing data}
 
@@ -233,8 +298,6 @@ AGCCUCCCACCUUUU
 
 \noindent
 As shown above the max score(maximum pairs) get from the Nussinov algorithm is 20, 34 and 45.\\
-
-\pagebreak
 
 \noindent
 Then the maximum stacking pairs method:
@@ -387,7 +450,9 @@ The advantages of my score function is consider the real energy of each stacking
 instead of just count the numbers. And I have considered the fact that, 
 short distance pair is more unstable than long distance pairs, and this point indeed improved the results of prediction.
 But my score function is not considered the energy of other secondary structures in addition to stacking pairs.
-So it can not predict the structure correctly. And this method also can not predict the pseudo-knot structure.
+So it can not predict the structure correctly.
+In addition the backtrack algorithm which I used can not trace all possible structures.
+Last, this method also can not predict the pseudo-knot structure.
 
 At the same time, this implementation is also not good enough. At least two point can be improved: 
 1. Python interpreter is not fast, if implement algorithm with C it will be much more faster.
