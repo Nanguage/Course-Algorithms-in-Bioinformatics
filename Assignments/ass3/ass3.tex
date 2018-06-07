@@ -79,12 +79,30 @@ list of tuples stored in $T_i$ for $i$=$0, 1, ..., 9$? Please discuss how do you
 $T_i$ from $T_{i-1}$.
 }
 
-\large{\textbf{Answer:}}
+\large{\textbf{Answer:}} \\
+
+\begin{tabular}{l|l}
+    \hline
+    t & Tuples \\
+    \hline
+    1 & \{(2, 1)\}\\
+    2 & \{(2, 1), (5, 2)\}\\
+    3 & \{(2, 1), (5, 2), (6, 3)\}\\
+    4 & \{(2, 1), (3, 2), (6, 3)\}\\
+    5 & \{(2, 1), (3, 2), (6, 3), (7, 4)\}\\
+    6 & \{(1, 1), (3, 2), (6, 3), (7, 4)\}\\
+    7 & \{(1, 1), (3, 2), (4, 3), (7, 4)\}\\
+    8 & \{(1, 1), (3, 2), (4, 3), (7, 4), (8, 5)\} \\
+    9 & \{(0, 1), (3, 2), (4, 3), (7, 4), (8, 5)\}
+\end{tabular} \\
 
 Construct $T_i$ from $T_{i-1}$:
 \begin{enumerate}
     \item Delete all tuples ($j$, $C_{i-1}[j]$) where $j \geq \delta(i)$ and $C_{i-1} \leq C{i-1}[\delta(i) - 1] + 1$
     \item Insert $(\delta(i), C_{i-1}[\delta(i)-1]+1)$
 \end{enumerate}
+
+Implementation see \\
+\url{https://github.com/Nanguage/Course-Algorithms-in-Bioinformatics/blob/master/L09/bs_lcs.py}.
 
 \end{document}
