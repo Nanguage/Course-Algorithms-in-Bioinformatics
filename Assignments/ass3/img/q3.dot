@@ -1,0 +1,95 @@
+digraph {
+	"10, 21" [shape=box]
+	"2, 29" [shape=box]
+	"9, 22" [shape=box]
+	"16, 15" [shape=box]
+	"1, 30" [shape=box]
+	"a, 1"
+	"17, 14" [shape=box]
+	"18, 13" [shape=box]
+	root
+	"e, 3"
+	"e, 2"
+	"7, 24" [shape=box]
+	"19, 12" [shape=box]
+	"f, 2"
+	"20, 11" [shape=box]
+	"g, 1"
+	"21, 10" [shape=box]
+	"22, 9" [shape=box]
+	"a, 3"
+	"23, 8" [shape=box]
+	"24, 7" [shape=box]
+	"s, 2"
+	"25, 6" [shape=box]
+	"f, 1"
+	"e, 1"
+	"26, 5" [shape=box]
+	"g, 2"
+	"27, 4" [shape=box]
+	"{, 2"
+	"28, 3" [shape=box]
+	"29, 2" [shape=box]
+	"30, 1" [shape=box]
+	"i, 3"
+	"3, 28" [shape=box]
+	"4, 27" [shape=box]
+	"11, 20" [shape=box]
+	"5, 26" [shape=box]
+	"6, 25" [shape=box]
+	"i, 2"
+	"15, 16" [shape=box]
+	"0, 31" [shape=box]
+	"8, 23" [shape=box]
+	"a, 2"
+	"g, 3"
+	"14, 17" [shape=box]
+	"12, 19" [shape=box]
+	"13, 18" [shape=box]
+	"e, 2" -> "e, 3" [label=T]
+	root -> "e, 1" [label=C]
+	"e, 2" -> "13, 18" [label="$"]
+	"a, 1" -> "24, 7" [label="GCTCT#"]
+	"i, 3" -> "16, 15" [label="CGTAAAGCTCT#"]
+	root -> "30, 1" [label="#"]
+	"f, 1" -> "s, 2" [label=C]
+	root -> "a, 1" [label=A]
+	root -> "g, 1" [label=T]
+	"s, 2" -> "25, 6" [label="TCT#"]
+	"s, 2" -> "18, 13" [label="GTAAAGCTCT#"]
+	"i, 2" -> "17, 14" [label="CGTAAAGCTCT#"]
+	"{, 2" -> "28, 3" [label="#"]
+	"g, 2" -> "27, 4" [label="T#"]
+	"i, 2" -> "9, 22" [label="ATCG$"]
+	"e, 3" -> "4, 27" [label="CGGGATCG$"]
+	"a, 3" -> "1, 30" [label="CGTCGGGATCG$"]
+	"f, 1" -> "10, 21" [label="ATCG$"]
+	"f, 1" -> "i, 2" [label=G]
+	"{, 2" -> "26, 5" [label="CT#"]
+	"a, 2" -> "a, 3" [label=A]
+	"a, 2" -> "23, 8" [label="GCTCT#"]
+	"a, 3" -> "22, 9" [label="GCTCT#"]
+	root -> "f, 1" [label=G]
+	"f, 1" -> "14, 17" [label="$"]
+	"g, 3" -> "12, 19" [label="$"]
+	"g, 1" -> "29, 2" [label="#"]
+	"a, 1" -> "11, 20" [label="TCG$"]
+	"e, 1" -> "{, 2" [label=T]
+	"g, 2" -> "g, 3" [label=G]
+	"g, 1" -> "21, 10" [label="AAAGCTCT#"]
+	"e, 2" -> "7, 24" [label="GGATCG$"]
+	"a, 1" -> "a, 2" [label=A]
+	"a, 1" -> "3, 28" [label="CGTCGGGATCG$"]
+	"g, 1" -> "g, 2" [label=C]
+	"e, 1" -> "e, 2" [label=G]
+	root -> "15, 16" [label="$"]
+	"a, 3" -> "0, 31" [label="ACGTCGGGATCG$"]
+	"i, 3" -> "8, 23" [label="ATCG$"]
+	"f, 1" -> "f, 2" [label=T]
+	"a, 2" -> "2, 29" [label="CGTCGGGATCG$"]
+	"i, 2" -> "i, 3" [label=G]
+	"f, 2" -> "5, 26" [label="CGGGATCG$"]
+	"g, 3" -> "6, 25" [label="GGATCG$"]
+	"e, 3" -> "19, 12" [label="AAAGCTCT#"]
+	"f, 2" -> "20, 11" [label="AAAGCTCT#"]
+}
