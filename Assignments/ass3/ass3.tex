@@ -18,7 +18,7 @@
 
 \renewcommand{\baselinestretch}{1.2}
 
-\usepackage[linesnumbered,boxed,lined]{algorithm2e}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
 
 \usepackage{graphicx}
 \usepackage{subcaption}
@@ -32,7 +32,6 @@
 }
 
 \usepackage{listings}
-
 
 \begin{document}
 
@@ -59,6 +58,100 @@ $O(n+m)$ time.)}
 
 \large{\textbf{Answer:}}
 
+This is not easy, and I'm not have enough time, so I referenced some papers. 
+In 1989 Landau and Vishkin proposed an approximate string matching algorithm\cite{landau1989fast}.
+This algorithm can solve approximate matching problem in $O(kn)$ time.
+In the original paper they denote $k$ as edit distance, but here the $k$ as Hamming distance,
+so it need to be modified for solve this problem. \\
+
+\pagebreak
+
+\noindent
+\textbf{Algorithm description:} \\
+
+We use $V(i,j)$ denote the Hamming distance between the $R[1..i]$ and $T[j-i..j]$.
+For example, when $T=GGGTCTA$ and $R=GTTC$, $V$ will be look like this:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+    \hline
+      & G & G & G & T & C & T & A \\
+    \hline
+    G & 0 & 0 & 0 & 1 & 0 & 1 & 1 \\
+    \hline
+    T &   & 1 & 1 & 0 & 2 & 1 & 2 \\
+    \hline
+    T &   &   & 2 & 1 & 1 & 2 & 2 \\
+    \hline
+    C &   &   &   & 3 & 1 & 2 & 3 \\
+    \hline
+\end{tabular}
+\end{center}
+
+Then we use $L_{d,e}$ denote the largest row in the $V_{d}$, that satisfy $V(row, row+d-1) \leq e$.
+Where $V_{d}$ is the $d$-$th$ diagonal in the table $V$. For example $V_1=0,1,2,3$ $V_2=0,1,1,1$ ...
+Clearly, if $L_{d,e} = m$ and $e \leq k$, we can say that $Hamming(R, T[d..d+m]) \leq k$. 
+So our goal is equivalente to find all $d$, that $L_{d,e}=m$ where $e \leq k$.
+
+Actually, according to Landau and Vishkin's proof\cite{landau1989fast}, $L_{d,e}$ can be computed by a dynamic programming 
+algorithm. 
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+    \SetKwFunction{print}{print}
+    \SetKwFunction{initialize}{initialize}
+
+    \Input{$T[1..n]$, $R[1..m]$, $k$}
+
+    \initialize{$L_{d,e}$, $T$, $R$}
+
+    \For{$e \leftarrow 1$ \KwTo $k$} {
+        \For{$d \leftarrow 1$ \KwTo $n-m+1$} {
+            $row \leftarrow \max{\{(L_{d,e-1}-1), (L_{d-1,e-1}), (L_{d+1,e-1}+1)\}}$ \\
+            \While{$(row < m) \wedge (row+d < n) \wedge (R[row+1]=T[row+d+1])$} {
+                $row \leftarrow row + 1$
+            }
+            $L_{d,e} \leftarrow row$ \\
+            \If{$L_{d,e} = m$} {
+                \print{d}
+            }
+        }
+    }
+    \caption{Dynamic programming for compute $L_{d,e}$}
+\end{algorithm}
+
+Then we discuss the base case of this dynamic programming algorithm:
+
+Firstly we build the generalized suffix tree of $T$ and $R$.
+The base case $L_{d,0}$ equal to find the LCP(Longest Common Prefix) of $R$ and $T[d..d+m]$.
+This can be done in $O(1)$ time.
+
+\begin{algorithm}[H]
+    \SetKwFunction{initialize}{initialize}
+    \SetKwProg{Fn}{procedure}{}{end}
+
+    \Fn{\initialize{$L_{d,e}$, $T$, $R$}} {
+        $L_{0, e} \leftarrow 0$ \\
+        build generalized suffix tree $\tau$ of $T$ and $R$ \\
+        \For{$d \leftarrow 1$ \KwTo $n-m+1$} {
+            $L_{d,0} \leftarrow LCP(R, T[d..d+m])$
+        }
+    }
+
+    \caption{Base case initialization}
+\end{algorithm}
+
+\ \\
+
+\noindent
+\textbf{Time analyze:}
+
+In this algorithm, build suffix tree take $O(m+n)$ time.
+For table initialization, need fill $n-m+1$ entry, each entry take $O(1)$ time,
+so this step take $O(n)$ time. 
+Fill the full table $L_{d,e}$ take $O(kn)$ time.
+So whole algorithm can be done in $O(kn)$ time.
+
 \section{Consider $S_1$=$AAAACGTCGGGATCG$ and $S_2$=$GGGCGTAAAGCTCT$.
 Suppose the minimum length of MUM is 3. \\
 (a) What is the set of MUMs? \\
@@ -83,7 +176,7 @@ $T_i$ from $T_{i-1}$.
 
 \begin{tabular}{l|l}
     \hline
-    t & Tuples \\
+    i & $T_i$ \\
     \hline
     1 & \{(2, 1)\}\\
     2 & \{(2, 1), (5, 2)\}\\
@@ -102,7 +195,10 @@ Construct $T_i$ from $T_{i-1}$:
     \item Insert $(\delta(i), C_{i-1}[\delta(i)-1]+1)$
 \end{enumerate}
 
-Implementation see \\
+My implementation see: \\
 \url{https://github.com/Nanguage/Course-Algorithms-in-Bioinformatics/blob/master/L09/bs_lcs.py}.
+
+\bibliographystyle{unsrt}
+\bibliography{ass3}
 
 \end{document}
